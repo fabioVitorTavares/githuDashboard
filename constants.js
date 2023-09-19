@@ -1,4 +1,4 @@
-const REPOS = [
+export const REPOS = [
   "githubDashboard",
   "Habitus",
   "learningShellScript",
@@ -33,20 +33,3 @@ const REPOS = [
   "fabioVitorTavares",
   "rocket-pay",
 ];
-
-console.log("Log line 30: ", REPOS);
-
-async function fetchRepo(repo) {
-  const resposeCommits = await fetch(
-    `https://api.github.com/repos/fabioVitorTavares/${repo}/commits`
-  );
-  const dataCommits = await resposeCommits.json();
-
-  console.log("Log line 35: ", { dataCommits });
-}
-
-(function main() {
-  REPOS.map((repo) => fetchRepo(repo));
-})();
-
-// fetchRepo("githubDashboard");
