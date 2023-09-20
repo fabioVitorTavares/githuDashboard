@@ -1,3 +1,8 @@
+import { Octokit, App } from "https://esm.sh/octokit";
+const octokit = new Octokit({
+  auth: "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",
+});
+
 const REPOS = [
   "githubDashboard",
   "Habitus",
@@ -34,19 +39,45 @@ const REPOS = [
   "rocket-pay",
 ];
 
-console.log("Log line 30: ", REPOS);
+const BASE_URL = "https://api.github.com/repos/";
+const OWNER = "fabioVitorTavares";
+
+async function fetchLanguages(repos) {
+  const data = await octokit.request("GET /repos/{owner}/{repo}/languages", {
+    owner: OWNER,
+    repo: repos[0],
+  });
+
+  console.log("Log line 51: ", data);
+  // const promises = repos?.map((repo) => {
+  //   return octokit.request("GET /repos/{owner}/{repo}/issues", {
+  //     owner: OWNER,
+  //     repo,
+  //   });
+  // });
+  // const responses = await Promise.allSettled(promises);
+
+  // const jsonPromises = responses.map((response) => {
+  //   console.log("Log line 55: ", response);
+  // });
+  // const jsonResponses = await Promise.allSettled(jsonPromises);
+
+  // jsonResponses.map((jsonObject) => console.log("Log line 50: ", jsonObject));
+  // const languages = [];
+}
 
 async function fetchRepo(repo) {
-  const resposeCommits = await fetch(
-    `https://api.github.com/repos/fabioVitorTavares/${repo}/commits`
-  );
-  const dataCommits = await resposeCommits.json();
+  // const resposeCommits = await fetch(
+  //   `https://api.github.com/repos/fabioVitorTavares/${repo}/commits`
+  // );
+  // const dataCommits = await resposeCommits.json();
 
-  console.log("Log line 35: ", { dataCommits });
+  console.log("Log line 35: ", { data });
 }
 
 (function main() {
-  REPOS.map((repo) => fetchRepo(repo));
+  fetchLanguages([REPOS[0]]);
+  // REPOS.map((repo) => fetchRepo(repo));
 })();
 
 // fetchRepo("githubDashboard");
