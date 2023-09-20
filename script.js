@@ -1,6 +1,6 @@
 import { Octokit } from "https://esm.sh/octokit";
 const octokit = new Octokit({
-  auth: "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",
+  auth: "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",
 });
 
 const REPOS = [
@@ -71,7 +71,9 @@ async function fetchRepo(repo) {
 
   console.log("Log line 35: ", { data });
 }
-
+function getElement(id) {
+  return document.getElementById(id);
+}
 (async function main() {
   const languages = await fetchLanguages(REPOS);
 
@@ -116,4 +118,60 @@ function generateDataOfGrphLanguages(languages) {
     );
   });
   console.log(keysLanguages);
+
+  const graphLanguages = getElement("graph-languages");
+
+  console.log("Log line 122: ", graphLanguages);
+
+  // background: conic-gradient(
+  //   red 0deg, red 90deg,
+  //   yellow 90deg, yellow 180deg,
+  //   green 180deg, green 270deg,
+  //   blue 270deg, blue 360deg);
+
+  const colors = [
+    "blue",
+    "yellow",
+    "fuchsia",
+    "red",
+    "gray",
+    "blueviolet",
+    "chartreuse",
+    "crimson",
+    "darkgreen",
+    "darkturquoise",
+    "indigo",
+    "orangered",
+    "blue",
+    "yellow",
+    "fuchsia",
+    "red",
+    "gray",
+    "blueviolet",
+    "chartreuse",
+    "crimson",
+    "darkgreen",
+    "darkturquoise",
+    "indigo",
+    "orangered",
+  ];
+
+  let degAcumulate = 0;
+  const styleGraph = Object.keys(keysLanguages)
+    .map((language, index) => {
+      const deg = degAcumulate + keysLanguages[language]?.percent * 360;
+      console.log("Log line 163: ", deg);
+      const partStyle = [
+        `${colors[index]} ${degAcumulate}deg`,
+        `${colors[index]} ${deg}deg`,
+      ];
+      degAcumulate += keysLanguages[language]?.percent * 360;
+      degAcumulate = Math.min(degAcumulate, 360);
+      return partStyle;
+    })
+    .flat(1)
+    .join(", ");
+
+  console.log(styleGraph);
+  graphLanguages.style = `background: conic-gradient(${styleGraph});`;
 }
