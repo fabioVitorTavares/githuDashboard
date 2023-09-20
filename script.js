@@ -1,6 +1,6 @@
-import { Octokit, App } from "https://esm.sh/octokit";
+import { Octokit } from "https://esm.sh/octokit";
 const octokit = new Octokit({
-  auth: "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",
+  auth: "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",
 });
 
 const REPOS = [
@@ -39,31 +39,28 @@ const REPOS = [
   "rocket-pay",
 ];
 
-const BASE_URL = "https://api.github.com/repos/";
 const OWNER = "fabioVitorTavares";
 
 async function fetchLanguages(repos) {
-  const data = await octokit.request("GET /repos/{owner}/{repo}/languages", {
-    owner: OWNER,
-    repo: repos[0],
+  const promises = repos?.map((repo) => {
+    return octokit.request("GET /repos/{owner}/{repo}/languages", {
+      owner: OWNER,
+      repo,
+    });
   });
 
-  console.log("Log line 51: ", data);
-  // const promises = repos?.map((repo) => {
-  //   return octokit.request("GET /repos/{owner}/{repo}/issues", {
-  //     owner: OWNER,
-  //     repo,
-  //   });
-  // });
-  // const responses = await Promise.allSettled(promises);
+  const responses = await Promise.allSettled(promises);
 
-  // const jsonPromises = responses.map((response) => {
-  //   console.log("Log line 55: ", response);
-  // });
-  // const jsonResponses = await Promise.allSettled(jsonPromises);
+  const languages = responses.map((response, index) => {
+    if (response?.status === "fulfilled") {
+      return {
+        repo: repos[index],
+        languages: response?.value?.data,
+      };
+    }
+  });
 
-  // jsonResponses.map((jsonObject) => console.log("Log line 50: ", jsonObject));
-  // const languages = [];
+  return languages;
 }
 
 async function fetchRepo(repo) {
@@ -75,9 +72,48 @@ async function fetchRepo(repo) {
   console.log("Log line 35: ", { data });
 }
 
-(function main() {
-  fetchLanguages([REPOS[0]]);
-  // REPOS.map((repo) => fetchRepo(repo));
+(async function main() {
+  const languages = await fetchLanguages(REPOS);
+
+  generateDataOfGrphLanguages(languages);
 })();
 
-// fetchRepo("githubDashboard");
+function generateDataOfGrphLanguages(languages) {
+  console.log("Log line 90: ", languages);
+
+  const setOfLanguages = languages
+    .map((obj) => {
+      return [...Object.keys(obj.languages)];
+    })
+    .flat(1);
+
+  console.log("Log line 90: ", setOfLanguages);
+  const keysLanguages = {};
+  setOfLanguages.flatMap((language) => {
+    if (!Object.keys(keysLanguages).includes(language)) {
+      keysLanguages[language] = {
+        percent: 0,
+        code: 0,
+        occurrence: 0,
+      };
+    }
+  });
+
+  languages.flatMap((obj) => {
+    Object.keys(obj?.languages).flatMap((language) => {
+      keysLanguages[language].code += obj?.languages[language];
+      keysLanguages[language].occurrence += 1;
+    });
+  });
+
+  const totalOccurrences = Object.keys(keysLanguages).reduce((a, b) => {
+    return a + keysLanguages[b]?.occurrence;
+  }, 0);
+
+  Object.keys(keysLanguages).flatMap((language) => {
+    keysLanguages[language].percent = Number(
+      (keysLanguages[language].occurrence / totalOccurrences).toFixed(2)
+    );
+  });
+  console.log(keysLanguages);
+}
