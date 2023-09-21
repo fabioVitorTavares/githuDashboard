@@ -1,6 +1,6 @@
 import { Octokit } from "https://esm.sh/octokit";
 const octokit = new Octokit({
-  auth: "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",
+  auth: "",
 });
 
 const REPOS = [
@@ -37,6 +37,33 @@ const REPOS = [
   "e-commerce",
   "fabioVitorTavares",
   "rocket-pay",
+];
+
+const colors = [
+  "blue",
+  "yellow",
+  "fuchsia",
+  "red",
+  "gray",
+  "blueviolet",
+  "chartreuse",
+  "crimson",
+  "darkgreen",
+  "darkturquoise",
+  "indigo",
+  "orangered",
+  "blue",
+  "yellow",
+  "fuchsia",
+  "red",
+  "gray",
+  "blueviolet",
+  "chartreuse",
+  "crimson",
+  "darkgreen",
+  "darkturquoise",
+  "indigo",
+  "orangered",
 ];
 
 const OWNER = "fabioVitorTavares";
@@ -114,64 +141,44 @@ function generateDataOfGrphLanguages(languages) {
 
   Object.keys(keysLanguages).flatMap((language) => {
     keysLanguages[language].percent = Number(
-      (keysLanguages[language].occurrence / totalOccurrences).toFixed(2)
+      (keysLanguages[language].occurrence / totalOccurrences).toFixed(4)
     );
   });
-  console.log(keysLanguages);
-
-  const graphLanguages = getElement("graph-languages");
-
-  console.log("Log line 122: ", graphLanguages);
-
-  // background: conic-gradient(
-  //   red 0deg, red 90deg,
-  //   yellow 90deg, yellow 180deg,
-  //   green 180deg, green 270deg,
-  //   blue 270deg, blue 360deg);
-
-  const colors = [
-    "blue",
-    "yellow",
-    "fuchsia",
-    "red",
-    "gray",
-    "blueviolet",
-    "chartreuse",
-    "crimson",
-    "darkgreen",
-    "darkturquoise",
-    "indigo",
-    "orangered",
-    "blue",
-    "yellow",
-    "fuchsia",
-    "red",
-    "gray",
-    "blueviolet",
-    "chartreuse",
-    "crimson",
-    "darkgreen",
-    "darkturquoise",
-    "indigo",
-    "orangered",
-  ];
 
   let degAcumulate = 0;
-  const styleGraph = Object.keys(keysLanguages)
-    .map((language, index) => {
-      const deg = degAcumulate + keysLanguages[language]?.percent * 360;
-      console.log("Log line 163: ", deg);
-      const partStyle = [
-        `${colors[index]} ${degAcumulate}deg`,
-        `${colors[index]} ${deg}deg`,
-      ];
-      degAcumulate += keysLanguages[language]?.percent * 360;
-      degAcumulate = Math.min(degAcumulate, 360);
-      return partStyle;
-    })
-    .flat(1)
-    .join(", ");
+  const styleGraph = Object.keys(keysLanguages).map((language, index) => {
+    const deg = degAcumulate + keysLanguages[language]?.percent * 360;
+    const partStyle = {
+      degInitial: degAcumulate,
+      degFinaly: deg,
+      color: colors[index],
+    };
+    degAcumulate += keysLanguages[language]?.percent * 360;
+    degAcumulate = Math.min(degAcumulate, 360);
+    return partStyle;
+  });
 
-  console.log(styleGraph);
-  graphLanguages.style = `background: conic-gradient(${styleGraph});`;
+  console.log("Log line 169: ", styleGraph);
+
+  const graphContainer = getElement("graph-languages-container");
+
+  styleGraph.flatMap((graphStyle) => {
+    const partGrph = document.createElement("div");
+    partGrph.setAttribute("class", "part-graph");
+    partGrph.style = getStyle(graphStyle);
+    partGrph.addEventListener("mousemove", hoverGrap);
+    graphContainer.appendChild(partGrph);
+  });
+}
+
+function hoverGrap(e) {
+  // this.style += " transform: scale(1.2);";
+  console.log("Log line 179: ", e);
+}
+
+function getStyle({ degInitial, degFinaly, color }) {
+  return `background: conic-gradient(
+    #FFF0 0deg, #FFF0 ${degInitial}deg,
+    ${color} ${degInitial}deg, ${color} ${degFinaly}deg,
+    #FFF0 ${degFinaly}deg, #FFF0 360deg)`;
 }

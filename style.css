@@ -1,6 +1,41 @@
-#graph-languages {
-  width: 200px;
+#graph-languages-container{
+  border: 1px solid #000;
+  height: 400px;
+  width: 400px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.part-graph {
+  position: absolute;  
+  width: 400px;
+  height: 400px;
+  border-radius: 200px;  
+}
+
+
+
+#q{ 
+  width: 400px;
   height: 200px;
   border-radius: 100px;
+  /* clip-path: polygon( 49% 54%, 100% 100%);  */
+  background-color: red;
+  
+    width: 0;
+    height: 0;
+    border-left: 35px solid transparent;
+    border-right: 35px solid transparent;
+    border-top: 50px solid #333;
+    border-radius: 50%;
+  
 }
+
+#q:hover{
+  /* transform: scale(2); */
+}
+
 
