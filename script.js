@@ -2,7 +2,6 @@ import { Octokit } from "https://esm.sh/octokit";
 const octokit = new Octokit({
   auth: "",
 });
-
 const REPOS = [
   "githubDashboard",
   "Habitus",
@@ -182,6 +181,28 @@ async function fetchLanguages(repos) {
   return languages;
 }
 
+async function fetchCommits(repos) {
+  const promises = repos?.map((repo) => {
+    return octokit.request("GET /repos/{owner}/{repo}/commits", {
+      owner: OWNER,
+      repo,
+    });
+  });
+
+  const responses = await Promise.allSettled(promises);
+
+  const commits = responses.map((response, index) => {
+    if (response?.status === "fulfilled") {
+      return {
+        repo: repos[index],
+        commits: response?.value?.data,
+      };
+    }
+  });
+
+  return commits;
+}
+
 async function fetchRepo(repo) {
   // const resposeCommits = await fetch(
   //   `https://api.github.com/repos/fabioVitorTavares/${repo}/commits`
@@ -193,10 +214,39 @@ async function fetchRepo(repo) {
 function getElement(id) {
   return document.getElementById(id);
 }
-(async function main() {
-  const languages = await fetchLanguages(REPOS);
 
-  generateDataOfGrphLanguages(languages);
+(async function main() {
+  //   const languages = await fetchLanguages(REPOS);
+  //   generateDataOfGrphLanguages(languages);
+  //
+
+  const commits = await fetchCommits(REPOS);
+
+  console.log("Log line 226: ", commits);
+
+  const commitsByDate = commits
+    .map((obj) => {
+      return obj?.commits?.map(({ commit }) => {
+        return {
+          date: commit?.author?.date,
+        };
+      });
+    })
+    .flat(1)
+
+    .map(({ date }) => new Date(date).toLocaleDateString());
+
+  const commitDate = {};
+
+  commitsByDate.flatMap((date) => {
+    if (commitDate[date]) {
+      commitDate[date].count += 1;
+    } else {
+      commitDate[date] = { count: 1 };
+    }
+  });
+
+  console.log("Log line 236: ", commitDate);
 })();
 
 function generateDataOfGrphLanguages(languages) {
