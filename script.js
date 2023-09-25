@@ -216,37 +216,10 @@ function getElement(id) {
 }
 
 (async function main() {
-  //   const languages = await fetchLanguages(REPOS);
-  //   generateDataOfGrphLanguages(languages);
-  //
+  const languages = await fetchLanguages(REPOS);
+  generateDataOfGrphLanguages(languages);
 
-  const commits = await fetchCommits(REPOS);
-
-  console.log("Log line 226: ", commits);
-
-  const commitsByDate = commits
-    .map((obj) => {
-      return obj?.commits?.map(({ commit }) => {
-        return {
-          date: commit?.author?.date,
-        };
-      });
-    })
-    .flat(1)
-
-    .map(({ date }) => new Date(date).toLocaleDateString());
-
-  const commitDate = {};
-
-  commitsByDate.flatMap((date) => {
-    if (commitDate[date]) {
-      commitDate[date].count += 1;
-    } else {
-      commitDate[date] = { count: 1 };
-    }
-  });
-
-  console.log("Log line 236: ", commitDate);
+  generateGrphCommits(REPOS);
 })();
 
 function generateDataOfGrphLanguages(languages) {
@@ -359,4 +332,45 @@ function getStyle({ degInitial, degFinaly, color }) {
     #FFF0 0deg, #FFF0 ${degInitial}deg,
     ${color} ${degInitial}deg, ${color} ${degFinaly}deg,
     #FFF0 ${degFinaly}deg, #FFF0 360deg)`;
+}
+
+//Graph commits by date
+async function generateGrphCommits(REPOS) {
+  const commits = await fetchCommits(REPOS);
+
+  const commitsByDate = commits
+    .map((obj) => {
+      return obj?.commits?.map(({ commit }) => {
+        return {
+          date: commit?.author?.date,
+        };
+      });
+    })
+    .flat(1)
+
+    .map(({ date }) => new Date(date).toLocaleDateString());
+
+  const commitDate = {};
+
+  commitsByDate.flatMap((date) => {
+    if (commitDate[date]) {
+      commitDate[date].count += 1;
+    } else {
+      commitDate[date] = { count: 1 };
+    }
+  });
+
+  const graphContainer = getElement("graph-commits-container");
+
+  for (const key in commitDate) {
+    const column = document.createElement("div");
+    column.setAttribute("class", "colum-graph-commits");
+    console.log("Log line 369: ", commitDate[key]);
+    column.style = `width: 10px; height: ${
+      commitDate[key].count * 10
+    }px; background-color: ${colors[3]}`;
+
+    graphContainer.appendChild(column);
+  }
+  console.log("Log line 236: ", commitDate);
 }
