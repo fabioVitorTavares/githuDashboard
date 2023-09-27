@@ -262,6 +262,7 @@ function getElement(id) {
 
 function generateDataOfGrphLanguages(languages) {
   console.log("Log line 90: ", languages);
+  const tolltip = getElement("tooltip-graph-languages");
 
   const setOfLanguages = languages
     .map((obj) => {
@@ -305,6 +306,8 @@ function generateDataOfGrphLanguages(languages) {
       degInitial: degAcumulate,
       degFinaly: deg,
       color: colors[index],
+      percent: keysLanguages[language]?.percent,
+      language,
     };
     degAcumulate += keysLanguages[language]?.percent * 360;
     degAcumulate = Math.min(degAcumulate, 360);
@@ -332,6 +335,7 @@ function generateDataOfGrphLanguages(languages) {
       y: (e?.pageY - e?.target?.offsetTop - 200) * -1,
     };
     const pointDeg = getDegWithXY(pointInGrph.x, pointInGrph.y);
+    console.log("Log line 337: ", e);
     for (const s in styleGraph) {
       const enter = styleGraph[s].degInitial < pointDeg;
       pointDeg < styleGraph[s].degFinaly;
@@ -339,6 +343,15 @@ function generateDataOfGrphLanguages(languages) {
         styleGraph[s].degInitial < pointDeg &&
         pointDeg < styleGraph[s].degFinaly
       ) {
+        tolltip.textContent = `${styleGraph[s].language}   ${(
+          styleGraph[s].percent * 100
+        ).toFixed(2)}%`;
+        tolltip.style = `
+        display: block;
+        background-color: ${styleGraph[s].color};
+        left: ${e.pageX - 20}px;
+        top: ${e.pageY - 40}px;
+        `;
         partsGraph[
           s
         ].style = `${partsGraph[s].style["cssText"]} transform: scale(1.15);`;
@@ -349,7 +362,9 @@ function generateDataOfGrphLanguages(languages) {
       }
     }
   }
+
   function outGraph(e) {
+    tolltip.style = `display: none`;
     for (const s in styleGraph) {
       partsGraph[
         s
