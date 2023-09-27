@@ -4,26 +4,44 @@
 }
 body{
   position: relative;
-  padding: 100px;
-}
-
-#card-graph-languages{
+  padding: 40px;
+  gap: 40px;
   background-color: rgb(239, 239, 239);
   display: flex;
   flex-direction: column;
+
+}
+
+#card-graphs, #card-graph-commits{
+  background-color: #FFF;
+  display: flex;
+  flex-direction: row;
   justify-content: center;
   text-align: center;
   justify-content: center;
-  border-radius: 40px;
+  border-radius: 20px;
+  box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
 }
 
-#h3-titulo-linguagens-utilizadas {
+
+
+#h3-titulo {
   margin-top: 50px;
+}
+
+.container-graph-title {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  padding: 40px;
 }
 
 
 #graph-languages-container{
-  margin: 100px;
+  
   height: 400px;
   width: 400px;
   display: flex;

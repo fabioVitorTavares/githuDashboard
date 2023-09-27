@@ -7,17 +7,32 @@
   <title>Github dashboard</title>
 </head>
 <body>
-  <div id="card-graph-languages">
-    <h3 id="h3-titulo-linguagens-utilizadas">Linguagens utilizadas</h3>
-    <div id="graph-languages-container"></div>
+  <div id="card-graphs">
+    <div class="container-graph-title">
+      
+      <h3 id="h3-titulo">Linguagens utilizadas</h3>
+      <div id="graph-languages-container"></div>
+    </div>
+    <div class="container-graph-title">
+      
+      <!-- <h3 id="h3-titulo">Commits ao longo do tempo</h3>
+      <div id="graph-commits-container"></div> -->
+    </div>
   </div>
-  <div id="graph-commits-container"></div>
+  
+  <div id="card-graph-commits">
+    <div class="container-graph-title">      
+      <h3 id="h3-titulo">Commits ao longo do tempo</h3>
+      <div id="graph-commits-container"></div>
+    </div>
+  </div>
     
 
  
   <span id="tooltip-graph-languages">span</span>
 </body>
 
-<script type="module" src="script.js"></script>
+<script type="module" src="graph-languages.js"></script>
+<!-- <script type="module" src="script.js"></script> -->
 
 </html>
