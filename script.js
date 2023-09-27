@@ -39,30 +39,68 @@ const REPOS = [
 ];
 
 const colors = [
-  "blue",
-  "yellow",
-  "fuchsia",
-  "red",
-  "gray",
-  "blueviolet",
-  "chartreuse",
-  "crimson",
-  "darkgreen",
-  "darkturquoise",
-  "indigo",
-  "orangered",
-  "blue",
-  "yellow",
-  "fuchsia",
-  "red",
-  "gray",
-  "blueviolet",
-  "chartreuse",
-  "crimson",
-  "darkgreen",
-  "darkturquoise",
-  "indigo",
-  "orangered",
+  "#618264",
+  "#3085C3",
+  "#D83F31",
+  "#5B0888",
+  "#D80032",
+  "#B4B4B3",
+  "#E55604",
+  "#004225",
+  "#FFB000",
+  "#35A29F",
+  "#FFCC70",
+  "#662549",
+  "#4F709C",
+  "#AED2FF",
+  "#A6FF96",
+  "#A73121",
+  "#D2DE32",
+  "#9D44C0",
+  "#0E21A0",
+  "#C63D2F",
+  "#94A684",
+  "#A2C579",
+  "#FFB6D9",
+  "#7091F5",
+  "#FFC436",
+  "#279EFF",
+  "#352F44",
+  "#EBE76C",
+  "#A8DF8E",
+  "#85E6C5",
+  "#F8DE22",
+  "#618264",
+  "#3085C3",
+  "#D83F31",
+  "#5B0888",
+  "#D80032",
+  "#B4B4B3",
+  "#E55604",
+  "#004225",
+  "#FFB000",
+  "#35A29F",
+  "#FFCC70",
+  "#662549",
+  "#4F709C",
+  "#AED2FF",
+  "#A6FF96",
+  "#A73121",
+  "#D2DE32",
+  "#9D44C0",
+  "#0E21A0",
+  "#C63D2F",
+  "#94A684",
+  "#A2C579",
+  "#FFB6D9",
+  "#7091F5",
+  "#FFC436",
+  "#279EFF",
+  "#352F44",
+  "#EBE76C",
+  "#A8DF8E",
+  "#85E6C5",
+  "#F8DE22",
 ];
 
 const mapDegTag = {
@@ -362,14 +400,15 @@ async function generateGrphCommits(REPOS) {
 
   const graphContainer = getElement("graph-commits-container");
 
+  let iColor = 0;
   for (const key in commitDate) {
     const column = document.createElement("div");
     column.setAttribute("class", "colum-graph-commits");
     console.log("Log line 369: ", commitDate[key]);
     column.style = `width: 10px; height: ${
       commitDate[key].count * 10
-    }px; background-color: ${colors[3]}`;
-
+    }px; background-color: ${colors[iColor]}`;
+    iColor += 1;
     graphContainer.appendChild(column);
   }
   console.log("Log line 236: ", commitDate);
