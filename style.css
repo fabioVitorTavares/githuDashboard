@@ -39,6 +39,16 @@ body{
   padding: 40px;
 }
 
+.container-graph-commits-title {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  padding: 40px;
+}
+
 
 #graph-languages-container{
   
@@ -62,18 +72,40 @@ body{
   display: none;
 }
 
+#scroll-graph-commits {
+  position: relative;
+  width: 100%;
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+/* width */
+#scroll-graph-commits::-webkit-scrollbar {
+  height: 10px;
+}
+
+/* Track */
+#scroll-graph-commits::-webkit-scrollbar-track {
+  background: #dedede; 
+  border-radius: 10px;
+}
+ 
+/* Handle */
+#scroll-graph-commits::-webkit-scrollbar-thumb {
+  background: #888; 
+  border-radius: 10px;
+}
 
 #graph-commits-container{
   height: 200px;
-  width: 1000px;
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: ce;
   align-items: end;
+  gap: 2px;
 }
 
 #months-graph-commits{
-  width: 1000px;
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;

@@ -593,15 +593,17 @@ async function generateGrphCommits(REPOS) {
   const regexRemoveDay = /..\//;
   const dataMonths = [];
   const graphContainer = getElement("graph-commits-container");
-  const sizeColumn = 2000 / commitsByDate.length;
+  const sizeColumn = 20;
+  graphContainer.style = `width: ${
+    sizeColumn * (Object.keys(commitDate).length + 2) + 600
+  }px`;
   for (const key in commitDate) {
-    console.log("Log line 598: ", commitDate[key]);
     dataMonths.push(key.replace(regexRemoveDay, ""));
     const column = document.createElement("div");
     column.setAttribute("class", "colum-graph-commits");
     column.setAttribute("id", `${key}`);
     column.style = `width: ${sizeColumn}px; height: ${
-      commitDate[key].count * 10
+      commitDate[key].count * 20
     }px; background-color: ${colors[commitDate[key].color]}`;
     graphContainer.appendChild(column);
     column.addEventListener("mousemove", hoverGraph);
@@ -631,9 +633,33 @@ async function generateGrphCommits(REPOS) {
     tooltipCommits.style = `
       display: block;
       background-color: ${colorTooltip};
-      left: ${e.pageX - 60}px;
+      left: ${e.pageX}px;
       top: ${e.pageY - 60}px;
       `;
+  }
+
+  const scrollDiv = getElement("scroll-graph-commits");
+  graphContainer.addEventListener("mousemove", scroolFunction);
+  graphContainer.addEventListener("wheel", whellScroll);
+  // graphContainer.addEventListener("mouseleave", outGraph);
+
+  function scroolFunction(e) {
+    const margem =
+      Number(window.getComputedStyle(scrollDiv)["width"].replace("px", "")) /
+      10;
+
+    const marginLeft = margem * 2;
+    const marginRight = margem * 8 + 80;
+    if (e.layerX < marginLeft) {
+      scrollDiv.scrollLeft -= 10;
+    } else if (e.layerX > marginRight) {
+      scrollDiv.scrollLeft += 10;
+    }
+  }
+
+  function whellScroll(e) {
+    e.preventDefault();
+    scrollDiv.scrollLeft -= e.deltaY;
   }
 }
 
