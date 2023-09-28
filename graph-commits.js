@@ -581,7 +581,7 @@ async function generateGrphCommits(REPOS) {
 
   const commitDate = {};
 
-  commitsByDate.flatMap((date, index) => {
+  commitsByDate.reverse().flatMap((date, index) => {
     if (commitDate[date]) {
       commitDate[date].count += 1;
     } else {
