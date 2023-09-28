@@ -50,8 +50,9 @@ body{
   align-items: center;
 }
 
-#tooltip-graph-languages {
-  background-color: red;
+
+/* Styles tooltips */
+#tooltip-graph-languages, #tooltip-graph-commits {
   position: absolute;
   padding: 4px 8px;
   border-radius: 4px;
@@ -59,18 +60,33 @@ body{
   top: 0;
   z-index: 2;
   display: none;
-
 }
 
 
 #graph-commits-container{
-  border: 1px solid #000;  
-  height: 400px;
-  width: 400px;
+  height: 200px;
+  width: 1000px;
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
+  justify-content: space-evenly;
   align-items: end;
+}
+
+#months-graph-commits{
+  width: 1000px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.span-month {
+  height: 50px;
+  padding: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: rotate(45deg);
 }
 
 
@@ -82,26 +98,5 @@ body{
   transition: ease-in-out 0.3s;
 }
 
-
-
-#q{ 
-  width: 400px;
-  height: 200px;
-  border-radius: 100px;
-  /* clip-path: polygon( 49% 54%, 100% 100%);  */
-  background-color: red;
-  
-    width: 0;
-    height: 0;
-    border-left: 35px solid transparent;
-    border-right: 35px solid transparent;
-    border-top: 50px solid #333;
-    border-radius: 50%;
-  
-}
-
-#q:hover{
-  /* transform: scale(2); */
-}
 
 

@@ -255,6 +255,4 @@ function getStyle({ degInitial, degFinaly, color }) {
 (async function main() {
   const languages = await fetchLanguages(REPOS);
   generateDataOfGrphLanguages(languages);
-
-  generateGrphCommits(REPOS);
 })();
