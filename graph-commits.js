@@ -591,33 +591,37 @@ async function generateGrphCommits(REPOS) {
   });
 
   const regexRemoveDay = /..\//;
-  const dataMonths = [];
+  const months = [];
   const graphContainer = getElement("graph-commits-container");
-  const sizeColumn = 20;
+  const sizeColumn = 50;
   graphContainer.style = `width: ${
     sizeColumn * (Object.keys(commitDate).length + 2) + 600
   }px`;
   for (const key in commitDate) {
-    dataMonths.push(key.replace(regexRemoveDay, ""));
+    months.push(key.replace(regexRemoveDay, ""));
+
+    const containerCollum = document.createElement("div");
+    containerCollum.setAttribute("class", "container-collum");
+
     const column = document.createElement("div");
     column.setAttribute("class", "colum-graph-commits");
     column.setAttribute("id", `${key}`);
     column.style = `width: ${sizeColumn}px; height: ${
       commitDate[key].count * 20
     }px; background-color: ${colors[commitDate[key].color]}`;
-    graphContainer.appendChild(column);
+
+    const newMonth = document.createElement("span");
+    newMonth.setAttribute("class", "span-month");
+    newMonth.innerHTML = key.replace(regexRemoveDay, "");
+
+    containerCollum.appendChild(column);
+    containerCollum.appendChild(newMonth);
+
+    graphContainer.appendChild(containerCollum);
+
     column.addEventListener("mousemove", hoverGraph);
     column.addEventListener("mouseleave", outGraph);
   }
-  const months = Array.from(new Set(dataMonths));
-
-  const monthsContainer = getElement("months-graph-commits");
-  months.flatMap((month) => {
-    const newMonth = document.createElement("span");
-    newMonth.setAttribute("class", "span-month");
-    newMonth.innerHTML = month;
-    monthsContainer.appendChild(newMonth);
-  });
 
   const tooltipCommits = getElement("tooltip-graph-commits");
   function outGraph(e) {
@@ -641,7 +645,6 @@ async function generateGrphCommits(REPOS) {
   const scrollDiv = getElement("scroll-graph-commits");
   graphContainer.addEventListener("mousemove", scroolFunction);
   graphContainer.addEventListener("wheel", whellScroll);
-  // graphContainer.addEventListener("mouseleave", outGraph);
 
   function scroolFunction(e) {
     const margem =
