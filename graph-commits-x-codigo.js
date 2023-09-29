@@ -539,9 +539,12 @@ const colors = [
   "#F8DE22",
 ];
 
-async function fetchCommits(repos) {
-  const promises = repos?.map((repo) => {
-    return octokit.request("GET /repos/{owner}/{repo}/commits", {
+function getElement(id) {
+  return document.getElementById(id);
+}
+async function fetchData() {
+  const promises = REPOS?.map((repo) => {
+    return octokit.request("GET /repos/{owner}/{repo}", {
       owner: OWNER,
       repo,
     });
@@ -549,125 +552,81 @@ async function fetchCommits(repos) {
 
   const responses = await Promise.allSettled(promises);
 
-  const commits = responses.map((response, index) => {
+  const sizes = responses.flatMap((response) => {
     if (response?.status === "fulfilled") {
-      return {
-        repo: repos[index],
-        commits: response?.value?.data,
-      };
+      return response?.value?.data?.size;
     }
   });
 
-  return commits;
-}
+  const promisesCommits = REPOS?.map((repo) => {
+    return octokit.request("GET /repos/{owner}/{repo}/commits", {
+      owner: OWNER,
+      repo,
+    });
+  });
+  const responsesCommits = await Promise.allSettled(promisesCommits);
 
-function getElement(id) {
-  return document.getElementById(id);
-}
-
-async function generateGrphCommits(REPOS) {
-  const commits = await fetchCommits(REPOS);
-
-  const commitsByDate = commits
-    .map((obj) => {
-      return obj?.commits?.map(({ commit }) => {
-        return {
-          date: commit?.author?.date,
-        };
-      });
-    })
-    .flat(1)
-    .map(({ date }) => new Date(date).toLocaleDateString());
-
-  const commitDate = {};
-
-  commitsByDate.reverse().flatMap((date, index) => {
-    if (commitDate[date]) {
-      commitDate[date].count += 1;
-    } else {
-      commitDate[date] = { count: 1 };
+  const numerosCommits = responsesCommits.flatMap((response) => {
+    if (response?.status === "fulfilled") {
+      console.log(response?.value?.data);
+      return response?.value?.data?.length;
     }
-    commitDate[date]["color"] = index;
   });
 
-  const regexRemoveDay = /..\//;
-  const months = [];
-  const graphContainer = getElement("graph-commits-container");
-  const sizeColumn = 50;
-  graphContainer.style = `width: ${
-    sizeColumn * (Object.keys(commitDate).length + 2) + 600
-  }px`;
-  for (const key in commitDate) {
-    months.push(key.replace(regexRemoveDay, ""));
+  console.log(sizes, numerosCommits);
 
-    const containerCollum = document.createElement("div");
-    containerCollum.setAttribute("class", "container-collum");
+  return sizes.map((size, index) => {
+    return {
+      commits: numerosCommits[index],
+      size,
+    };
+  });
+}
 
-    const column = document.createElement("div");
-    column.setAttribute("class", "colum-graph-commits");
-    column.setAttribute("id", `${key}`);
-    column.style = `width: ${sizeColumn}px; height: ${
-      commitDate[key].count * 20
-    }px; background-color: ${colors[commitDate[key].color]}`;
+function getMaxCommitMaxSize(data) {
+  const last = data.length - 1;
 
-    const newMonth = document.createElement("span");
-    newMonth.setAttribute("class", "span-month");
-    newMonth.innerHTML = key.replace(regexRemoveDay, "");
-
-    containerCollum.appendChild(column);
-    containerCollum.appendChild(newMonth);
-
-    graphContainer.appendChild(containerCollum);
-
-    column.addEventListener("mousemove", hoverGraph);
-    column.addEventListener("mouseleave", outGraph);
-  }
-
-  const tooltipCommits = getElement("tooltip-graph-commits");
-  function outGraph(e) {
-    tooltipCommits.innerHTML = "";
-    tooltipCommits.style = `display: none;`;
-  }
-
-  function hoverGraph(e) {
-    const colorTooltip = colors[commitDate[e.target.id].color];
-    tooltipCommits.innerHTML = `Date: ${e.target.id}<br>Commits: ${
-      commitDate[e.target.id].count
-    }`;
-    tooltipCommits.style = `
-      display: block;
-      background-color: ${colorTooltip};
-      left: ${e.pageX}px;
-      top: ${e.pageY - 60}px;
-      `;
-  }
-
-  const scrollDiv = getElement("scroll-graph-commits");
-  graphContainer.addEventListener("mousemove", scroolFunction);
-  graphContainer.addEventListener("wheel", whellScroll);
-
-  function scroolFunction(e) {
-    const margem =
-      Number(window.getComputedStyle(scrollDiv)["width"].replace("px", "")) /
-      10;
-
-    const marginLeft = margem * 2;
-    const marginRight = margem * 8 + 80;
-    if (e.layerX < marginLeft) {
-      scrollDiv.scrollLeft -= 10;
-    } else if (e.layerX > marginRight) {
-      scrollDiv.scrollLeft += 10;
+  let granSize = 0;
+  data.flatMap((d) => {
+    if (d.size > granSize) {
+      granSize = d.size;
     }
-  }
+  });
 
-  function whellScroll(e) {
-    e.preventDefault();
-    scrollDiv.scrollLeft -= e.deltaY;
-  }
+  return {
+    commits: data[last].commits,
+    size: granSize,
+  };
+}
 
-  scrollDiv.scrollTo({ left: 14000 });
+function generateLineGraph(data) {
+  data.sort((a, b) => (a.commits > b.commits ? 1 : -1));
+  const maxDatas = getMaxCommitMaxSize(data);
+  console.log(data);
+  console.log(maxDatas);
+
+  const ajustCommits = 100 / ((maxDatas.commits * 100) / 400);
+  const ajustSizes = 100 / ((maxDatas.size * 100) / 800);
+
+  console.log(ajustCommits, ajustSizes);
+
+  const graphLineContainer = getElement("graph-commits-x-codigo");
+  data.flatMap((d) => {
+    const y = d.commits * ajustCommits;
+    const x = d.size * ajustSizes;
+    const point = document.createElement("div");
+    point.setAttribute("class", "point-graph-line");
+    const idPoint = JSON.stringify(d);
+    point.setAttribute("id", `${idPoint}`);
+    point.style = `
+    left: ${x}px;
+    bottom: ${y}px;`;
+
+    graphLineContainer.appendChild(point);
+  });
 }
 
 (async function main() {
-  generateGrphCommits(REPOS);
+  const data = await fetchData();
+  generateLineGraph(data);
 })();
