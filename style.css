@@ -71,7 +71,7 @@ body{
 
 
 /* Styles tooltips */
-#tooltip-graph-languages, #tooltip-graph-commits {
+#tooltip-graph-languages, #tooltip-graph-commits, #tooltip-graph-lines {
   position: absolute;
   padding: 4px 8px;
   border-radius: 4px;
@@ -79,6 +79,7 @@ body{
   top: 0;
   z-index: 2;
   display: none;
+  font-size: 24px;
 }
 
 #scroll-graph-commits {
@@ -162,7 +163,6 @@ body{
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  border: 1px solid black;
 }
 
 .point-graph-line {
@@ -170,5 +170,12 @@ body{
   width: 20px;
   height: 20px;
   border-radius: 10px;
-  background-color: red;
+  background-color: green;
+  z-index: 2;
+}
+
+svg {
+  position: absolute;
+  left: 0;
+  top: 0;
 }

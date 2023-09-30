@@ -593,21 +593,63 @@ function generateLineGraph(data) {
     }
   }
 
-  console.log(getMaxCount(monthCount));
+  console.log(monthCount);
 
+  const tooltip = getElement("tooltip-graph-lines");
   const graphLineContainer = getElement("graph-commits-x-codigo");
-  const ajustX = 800 / Object.keys(monthCount).length;
+  const ajustX = 750 / Object.keys(monthCount).length;
+  const ajustY = 350 / getMaxCount(monthCount);
+  const pointsXY = [];
   Object.keys(monthCount).flatMap((monthKey, index) => {
-    const y = monthCount[monthKey].count * ajustX;
+    const y = monthCount[monthKey].count * ajustY;
     const x = index * ajustX;
+    pointsXY.push({ x: x + 10, y: y + 10 });
     const point = document.createElement("div");
+    point.addEventListener("mousemove", hoverPoint);
+    point.addEventListener("mouseleave", outPoint);
     point.setAttribute("class", "point-graph-line");
+    point.setAttribute("id", `${monthKey}`);
     point.style = `
     left: ${x}px;
     bottom: ${y}px;`;
 
     graphLineContainer.appendChild(point);
   });
+
+  function hoverPoint(e) {
+    tooltip.textContent = `${e.target.id}`;
+    tooltip.style = `
+    display: block;
+    background-color: green;
+    left: ${e.pageX + 10}px;
+    top: ${e.pageY - 40}px;
+    `;
+  }
+  function outPoint(e) {
+    tooltip.style = `
+    display: none;
+    `;
+  }
+
+  console.log(pointsXY);
+  pointsXY.reduce((p1, p2) => {
+    console.log(p1, p2);
+    if (p1 === 0) {
+      return p2;
+    }
+    const svg = document.createElement("sgv");
+    svg.innerHTML = `
+      <svg width="800px" height="400px">
+        <line x1="${p1.x | 0 || 0}" y1="${400 - (p1.y | 0) || 0}" x2="${
+      p2.x | 0
+    }" y2="${400 - (p2.y | 0)}" 
+        stroke="green"></line> 
+      </svg>    
+    `;
+    graphLineContainer.appendChild(svg);
+
+    return p2;
+  }, 0);
 }
 
 (async function main() {
