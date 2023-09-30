@@ -40,6 +40,13 @@ const REPOS = [
 ];
 
 const colors = [
+  "#A73121",
+  "#D2DE32",
+  "#9D44C0",
+  "#0E21A0",
+  "#C63D2F",
+  "#94A684",
+  "#A2C579",
   "#618264",
   "#3085C3",
   "#D83F31",
@@ -167,34 +174,45 @@ function generateDataOfGrphLanguages(languages) {
     );
   });
 
+  const keysLanguagesArray = Object.keys(keysLanguages)
+    .map((language) => {
+      return { ...keysLanguages[language], language };
+    })
+    .sort((a, b) => (a.percent > b.percent ? -1 : 1));
+
   let degAcumulate = 0;
-  const styleGraph = Object.keys(keysLanguages).map((language, index) => {
-    const deg = degAcumulate + keysLanguages[language]?.percent * 360;
+  const styleGraph = keysLanguagesArray.map((language, index) => {
+    const deg = degAcumulate + language?.percent * 360;
     const partStyle = {
       degInitial: degAcumulate,
       degFinaly: deg,
       color: colors[index],
-      percent: keysLanguages[language]?.percent,
-      language,
+      percent: language?.percent,
+      language: language.language,
     };
-    degAcumulate += keysLanguages[language]?.percent * 360;
+    degAcumulate += language?.percent * 360;
     degAcumulate = Math.min(degAcumulate, 360);
     return partStyle;
   });
 
   const graphContainer = getElement("graph-languages-container");
 
+  styleGraph.sort((a, b) => (a.percent > b.percent ? 1 : -1));
+
   const partsGraph = [];
-  styleGraph.flatMap((graphStyle, index) => {
-    const partGrph = document.createElement("div");
-    partGrph.setAttribute("class", "part-graph");
-    partGrph.setAttribute("id", `part-graph-${index}`);
-    partGrph.style = getStyle(graphStyle);
-    partGrph.addEventListener("mousemove", hoverGraph);
-    partGrph.addEventListener("mouseleave", outGraph);
-    graphContainer.appendChild(partGrph);
-    partsGraph.push(partGrph);
-  });
+  styleGraph
+    .sort((a, b) => (a.percent > b.percent ? 1 : -1))
+    .flatMap((graphStyle, index) => {
+      const partGrph = document.createElement("div");
+      partGrph.setAttribute("class", "part-graph");
+      partGrph.setAttribute("id", `part-graph-${index}`);
+      partGrph.style = getStyle(graphStyle);
+      partGrph.addEventListener("mousemove", hoverGraph);
+      partGrph.addEventListener("mouseleave", outGraph);
+      graphContainer.appendChild(partGrph);
+      partsGraph.push(partGrph);
+    });
+
   function hoverGraph(e) {
     const pointInGrph = {
       x: e?.pageX - e?.target?.offsetLeft - 200,
@@ -236,6 +254,28 @@ function generateDataOfGrphLanguages(languages) {
       ].style = `${partsGraph[s].style["cssText"]} transform: scale(1);`;
     }
   }
+
+  const dataLegnt = styleGraph.slice(-4).reverse();
+  const legend = getElement("legend-grapg-languages");
+
+  console.log(dataLegnt);
+  dataLegnt.flatMap((language) => {
+    const mark = document.createElement("div");
+    mark.setAttribute("class", "mark-legend");
+    mark.style = `background-color: ${language.color}`;
+
+    const nameLanguage = document.createElement("span");
+    nameLanguage.innerText = language.language;
+
+    const lineLegend = document.createElement("div");
+    lineLegend.setAttribute("class", "line-legend");
+
+    lineLegend.appendChild(mark);
+    lineLegend.appendChild(nameLanguage);
+
+    legend.appendChild(lineLegend);
+  });
+  console.log(styleGraph);
 }
 function getDegWithXY(x, y) {
   const deg = (Math.atan2(x, y) * 180) / Math.PI;
