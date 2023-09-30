@@ -543,21 +543,6 @@ function getElement(id) {
   return document.getElementById(id);
 }
 async function fetchData() {
-  const promises = REPOS?.map((repo) => {
-    return octokit.request("GET /repos/{owner}/{repo}", {
-      owner: OWNER,
-      repo,
-    });
-  });
-
-  const responses = await Promise.allSettled(promises);
-
-  const sizes = responses.flatMap((response) => {
-    if (response?.status === "fulfilled") {
-      return response?.value?.data?.size;
-    }
-  });
-
   const promisesCommits = REPOS?.map((repo) => {
     return octokit.request("GET /repos/{owner}/{repo}/commits", {
       owner: OWNER,
@@ -566,58 +551,57 @@ async function fetchData() {
   });
   const responsesCommits = await Promise.allSettled(promisesCommits);
 
-  const numerosCommits = responsesCommits.flatMap((response) => {
+  const numerosCommits = responsesCommits.flatMap((response, index) => {
     if (response?.status === "fulfilled") {
-      console.log(response?.value?.data);
-      return response?.value?.data?.length;
+      return {
+        repo: REPOS[index],
+        commits: response?.value?.data,
+      };
     }
   });
-
-  console.log(sizes, numerosCommits);
-
-  return sizes.map((size, index) => {
-    return {
-      commits: numerosCommits[index],
-      size,
-    };
-  });
+  return numerosCommits;
 }
 
-function getMaxCommitMaxSize(data) {
-  const last = data.length - 1;
-
-  let granSize = 0;
-  data.flatMap((d) => {
-    if (d.size > granSize) {
-      granSize = d.size;
-    }
-  });
-
-  return {
-    commits: data[last].commits,
-    size: granSize,
-  };
+function getMaxCount(object) {
+  return object[
+    Object.keys(object).reduce((i, j) => {
+      return object[i]?.count > object[j]?.count ? i : j;
+    }, 0)
+  ]?.count;
 }
 
 function generateLineGraph(data) {
-  data.sort((a, b) => (a.commits > b.commits ? 1 : -1));
-  const maxDatas = getMaxCommitMaxSize(data);
-  console.log(data);
-  console.log(maxDatas);
+  const commitOfMonths = {};
+  data.flatMap((d) => {
+    d.commits.flatMap((c) => {
+      const month = new Date(c.commit.author.date)
+        .toLocaleDateString()
+        .replace(/..\//, "");
 
-  const ajustCommits = 100 / ((maxDatas.commits * 100) / 400);
-  const ajustSizes = 100 / ((maxDatas.size * 100) / 800);
+      commitOfMonths[`${month}|${d.repo}`] = 1;
+    });
+  });
 
-  console.log(ajustCommits, ajustSizes);
+  const monthCount = {};
+  for (const key in commitOfMonths) {
+    const monthKey = key.replace(/\|.*/g, "");
+
+    if (monthCount[monthKey]) {
+      monthCount[monthKey].count += 1;
+    } else {
+      monthCount[monthKey] = { count: 1 };
+    }
+  }
+
+  console.log(getMaxCount(monthCount));
 
   const graphLineContainer = getElement("graph-commits-x-codigo");
-  data.flatMap((d) => {
-    const y = d.commits * ajustCommits;
-    const x = d.size * ajustSizes;
+  const ajustX = 800 / Object.keys(monthCount).length;
+  Object.keys(monthCount).flatMap((monthKey, index) => {
+    const y = monthCount[monthKey].count * ajustX;
+    const x = index * ajustX;
     const point = document.createElement("div");
     point.setAttribute("class", "point-graph-line");
-    const idPoint = JSON.stringify(d);
-    point.setAttribute("id", `${idPoint}`);
     point.style = `
     left: ${x}px;
     bottom: ${y}px;`;
@@ -628,5 +612,6 @@ function generateLineGraph(data) {
 
 (async function main() {
   const data = await fetchData();
+
   generateLineGraph(data);
 })();
