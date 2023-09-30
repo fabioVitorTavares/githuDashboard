@@ -593,8 +593,6 @@ function generateLineGraph(data) {
     }
   }
 
-  console.log(monthCount);
-
   const tooltip = getElement("tooltip-graph-lines");
   const graphLineContainer = getElement("graph-commits-x-codigo");
   const ajustX = 750 / Object.keys(monthCount).length;
@@ -631,9 +629,7 @@ function generateLineGraph(data) {
     `;
   }
 
-  console.log(pointsXY);
   pointsXY.reduce((p1, p2) => {
-    console.log(p1, p2);
     if (p1 === 0) {
       return p2;
     }
