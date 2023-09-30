@@ -598,7 +598,6 @@ function generateLineGraph(data) {
   const ajustX = 750 / Object.keys(monthCount).length;
   const ajustY = 350 / getMaxCount(monthCount);
   const pointsXY = [];
-  console.log(monthCount);
   Object.keys(monthCount).flatMap((monthKey, index) => {
     const y = monthCount[monthKey].count * ajustY;
     const x = index * ajustX;
@@ -664,14 +663,12 @@ function generateLineGraph(data) {
     left: ${e.pageX + 10}px;
     top: ${e.pageY - 80}px;
     `;
-    console.log(e.target.id);
   }
   function outPoint(e) {
     tooltip.style = `
     display: none;
     `;
   }
-  console.log(pointsXY);
   pointsXY.reduce((p1, p2) => {
     if (p1 === 0) {
       return p2;
