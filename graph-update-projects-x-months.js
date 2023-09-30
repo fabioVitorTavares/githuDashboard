@@ -594,10 +594,11 @@ function generateLineGraph(data) {
   }
 
   const tooltip = getElement("tooltip-graph-lines");
-  const graphLineContainer = getElement("graph-commits-x-codigo");
+  const graphLineContainer = getElement("graph-update-projects-x-months");
   const ajustX = 750 / Object.keys(monthCount).length;
   const ajustY = 350 / getMaxCount(monthCount);
   const pointsXY = [];
+  console.log(monthCount);
   Object.keys(monthCount).flatMap((monthKey, index) => {
     const y = monthCount[monthKey].count * ajustY;
     const x = index * ajustX;
@@ -606,34 +607,77 @@ function generateLineGraph(data) {
     point.addEventListener("mousemove", hoverPoint);
     point.addEventListener("mouseleave", outPoint);
     point.setAttribute("class", "point-graph-line");
-    point.setAttribute("id", `${monthKey}`);
+    point.setAttribute(
+      "id",
+      `${monthKey}-${monthCount[monthKey].count}*${index}`
+    );
     point.style = `
     left: ${x}px;
     bottom: ${y}px;`;
 
+    const spanMonth = document.createElement("span");
+    const spanCount = document.createElement("span");
+    spanMonth.setAttribute("class", "span-month-graph-line");
+    spanMonth.setAttribute("id", `span-month-graph-line-${index}`);
+    spanCount.setAttribute("class", "span-count-graph-line");
+    spanCount.setAttribute(
+      "id",
+      `span-count-graph-line-${monthCount[monthKey].count}`
+    );
+
+    spanMonth.innerHTML = monthKey;
+    spanMonth.style = `left: ${x}px`;
+
+    spanCount.innerHTML = index;
+    spanCount.style = `top: ${380 - index * ajustY}px`;
+
     graphLineContainer.appendChild(point);
+    graphLineContainer.appendChild(spanMonth);
+    graphLineContainer.appendChild(spanCount);
   });
 
+  const montMap = {
+    "01": "Jan",
+    "02": "Fev",
+    "03": "Mar",
+    "04": "Abr",
+    "05": "Mai",
+    "06": "Jun",
+    "07": "Jul",
+    "08": "Ago",
+    "09": "Set",
+    10: "Out",
+    11: "Nov",
+    12: "Dez",
+  };
+
   function hoverPoint(e) {
-    tooltip.textContent = `${e.target.id}`;
+    const infos = `Mês: ${
+      montMap[e.target.id.replace(/\/.*/g, "")]
+    }/${e.target.id.replace(/(.*\/..)|(-.*)/g, "")}<br>
+    Projetos: ${e.target.id.replace(/(.*-)|(\*.)/g, "")}`;
+
+    tooltip.innerHTML = `${infos}`;
     tooltip.style = `
     display: block;
     background-color: green;
     left: ${e.pageX + 10}px;
-    top: ${e.pageY - 40}px;
+    top: ${e.pageY - 80}px;
     `;
+    console.log(e.target.id);
   }
   function outPoint(e) {
     tooltip.style = `
     display: none;
     `;
   }
-
+  console.log(pointsXY);
   pointsXY.reduce((p1, p2) => {
     if (p1 === 0) {
       return p2;
     }
     const svg = document.createElement("sgv");
+
     svg.innerHTML = `
       <svg width="800px" height="400px">
         <line x1="${p1.x | 0 || 0}" y1="${400 - (p1.y | 0) || 0}" x2="${
@@ -642,6 +686,7 @@ function generateLineGraph(data) {
         stroke="green"></line> 
       </svg>    
     `;
+
     graphLineContainer.appendChild(svg);
 
     return p2;

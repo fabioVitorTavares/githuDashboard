@@ -155,7 +155,7 @@ body{
 
 
 
-#graph-commits-x-codigo {
+#graph-update-projects-x-months {
   position: relative;
   height: 400px;
   width: 800px;
@@ -178,4 +178,14 @@ svg {
   position: absolute;
   left: 0;
   top: 0;
+}
+
+.span-month-graph-line {
+  position: absolute;
+  top: 400px;
+}
+
+.span-count-graph-line {
+  position: absolute;
+  left: -20px;
 }
