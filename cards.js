@@ -542,16 +542,28 @@ const colors = [
 function getElement(id) {
   return document.getElementById(id);
 }
-async function fetchData() {
-  const promisesCommits = REPOS?.map((repo) => {
+
+async function generateCards() {
+  const cardContainer = getElement("card-cards");
+
+  const cardNumRepos = document.createElement("span");
+  cardNumRepos.setAttribute("class", "card-info");
+  cardNumRepos.innerHTML = `<i>${
+    REPOS.length ?? 0
+  }</i><br><strong>Repositórios</strong> `;
+
+  cardContainer.appendChild(cardNumRepos);
+
+  const promises = REPOS?.map((repo) => {
     return octokit.request("GET /repos/{owner}/{repo}/commits", {
       owner: OWNER,
       repo,
     });
   });
-  const responsesCommits = await Promise.allSettled(promisesCommits);
 
-  const numerosCommits = responsesCommits.flatMap((response, index) => {
+  const responses = await Promise.allSettled(promises);
+
+  const commits = responses.map((response, index) => {
     if (response?.status === "fulfilled") {
       return {
         repo: REPOS[index],
@@ -559,139 +571,44 @@ async function fetchData() {
       };
     }
   });
-  return numerosCommits;
-}
 
-function getMaxCount(object) {
-  return object[
-    Object.keys(object).reduce((i, j) => {
-      return object[i]?.count > object[j]?.count ? i : j;
-    }, 0)
-  ]?.count;
-}
+  const totalCommits = commits.reduce((p, i) => {
+    return p + i.commits.length;
+  }, 0);
 
-function generateLineGraph(data) {
-  const commitOfMonths = {};
-  data.flatMap((d) => {
-    d.commits.flatMap((c) => {
-      const month = new Date(c.commit.author.date)
-        .toLocaleDateString()
-        .replace(/..\//, "");
+  const cardNumCommits = document.createElement("span");
+  cardNumCommits.setAttribute("class", "card-info");
+  cardNumCommits.innerHTML = `<i>${
+    totalCommits ?? 0
+  }</i><br><strong>Commits</strong> `;
 
-      commitOfMonths[`${month}|${d.repo}`] = 1;
+  cardContainer.appendChild(cardNumCommits);
+
+  const promisesRepo = REPOS?.map((repo) => {
+    return octokit.request("GET /repos/{owner}/{repo}", {
+      owner: OWNER,
+      repo,
     });
   });
 
-  const monthCount = {};
-  for (const key in commitOfMonths) {
-    const monthKey = key.replace(/\|.*/g, "");
+  const responsesRepo = await Promise.allSettled(promisesRepo);
 
-    if (monthCount[monthKey]) {
-      monthCount[monthKey].count += 1;
-    } else {
-      monthCount[monthKey] = { count: 1 };
+  let sizeKb = 0;
+  const dataRepos = responsesRepo.map((response, index) => {
+    if (response?.status === "fulfilled") {
+      sizeKb += response?.value?.data?.size;
     }
-  }
-
-  const tooltip = getElement("tooltip-graph-lines");
-  const graphLineContainer = getElement("graph-update-projects-x-months");
-  const ajustX = 550 / Object.keys(monthCount).length;
-  const ajustY = 350 / getMaxCount(monthCount);
-  const pointsXY = [];
-  Object.keys(monthCount).flatMap((monthKey, index) => {
-    const y = monthCount[monthKey].count * ajustY;
-    const x = index * ajustX;
-    pointsXY.push({ x: x + 10, y: y + 10 });
-    const point = document.createElement("div");
-    point.addEventListener("mousemove", hoverPoint);
-    point.addEventListener("mouseleave", outPoint);
-    point.setAttribute("class", "point-graph-line");
-    point.setAttribute(
-      "id",
-      `${monthKey}-${monthCount[monthKey].count}*${index}`
-    );
-    point.style = `
-    left: ${x}px;
-    bottom: ${y}px;`;
-
-    const spanMonth = document.createElement("span");
-    const spanCount = document.createElement("span");
-    spanMonth.setAttribute("class", "span-month-graph-line");
-    spanMonth.setAttribute("id", `span-month-graph-line-${index}`);
-    spanCount.setAttribute("class", "span-count-graph-line");
-    spanCount.setAttribute(
-      "id",
-      `span-count-graph-line-${monthCount[monthKey].count}`
-    );
-
-    spanMonth.innerHTML = monthKey;
-    spanMonth.style = `left: ${x}px`;
-
-    spanCount.innerHTML = index;
-    spanCount.style = `top: ${380 - index * ajustY}px`;
-
-    graphLineContainer.appendChild(point);
-    graphLineContainer.appendChild(spanMonth);
-    graphLineContainer.appendChild(spanCount);
   });
 
-  const montMap = {
-    "01": "Jan",
-    "02": "Fev",
-    "03": "Mar",
-    "04": "Abr",
-    "05": "Mai",
-    "06": "Jun",
-    "07": "Jul",
-    "08": "Ago",
-    "09": "Set",
-    10: "Out",
-    11: "Nov",
-    12: "Dez",
-  };
+  const cardSize = document.createElement("span");
+  cardSize.setAttribute("class", "card-info");
+  cardSize.innerHTML = `<i>${(sizeKb / 1000).toFixed(
+    2
+  )}Mb</i><br><strong>Código gerado</strong> `;
 
-  function hoverPoint(e) {
-    const infos = `Mês: ${
-      montMap[e.target.id.replace(/\/.*/g, "")]
-    }/${e.target.id.replace(/(.*\/..)|(-.*)/g, "")}<br>
-    Projetos: ${e.target.id.replace(/(.*-)|(\*.)/g, "")}`;
-
-    tooltip.innerHTML = `${infos}`;
-    tooltip.style = `
-    display: block;
-    background-color: green;
-    left: ${e.pageX + 10}px;
-    top: ${e.pageY - 80}px;
-    `;
-  }
-  function outPoint(e) {
-    tooltip.style = `
-    display: none;
-    `;
-  }
-  pointsXY.reduce((p1, p2) => {
-    if (p1 === 0) {
-      return p2;
-    }
-    const svg = document.createElement("sgv");
-
-    svg.innerHTML = `
-      <svg width="800px" height="400px">
-        <line x1="${p1.x | 0 || 0}" y1="${400 - (p1.y | 0) || 0}" x2="${
-      p2.x | 0
-    }" y2="${400 - (p2.y | 0)}" 
-        stroke="green"></line> 
-      </svg>    
-    `;
-
-    graphLineContainer.appendChild(svg);
-
-    return p2;
-  }, 0);
+  cardContainer.appendChild(cardSize);
 }
 
 (async function main() {
-  const data = await fetchData();
-
-  generateLineGraph(data);
+  generateCards();
 })();

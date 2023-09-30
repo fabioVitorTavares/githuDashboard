@@ -201,7 +201,7 @@ function generateDataOfGrphLanguages(languages) {
 
   const partsGraph = [];
   styleGraph
-    .sort((a, b) => (a.percent > b.percent ? 1 : -1))
+    // .sort((a, b) => (a.percent > b.percent ? 1 : -1))
     .flatMap((graphStyle, index) => {
       const partGrph = document.createElement("div");
       partGrph.setAttribute("class", "part-graph");
@@ -214,14 +214,14 @@ function generateDataOfGrphLanguages(languages) {
     });
 
   function hoverGraph(e) {
+    console.log(e);
     const pointInGrph = {
-      x: e?.pageX - e?.target?.offsetLeft - 200,
+      x: e?.pageX - e?.target?.offsetLeft,
       y: (e?.pageY - e?.target?.offsetTop - 200) * -1,
     };
     const pointDeg = getDegWithXY(pointInGrph.x, pointInGrph.y);
+    console.log(pointInGrph);
     for (const s in styleGraph) {
-      const enter = styleGraph[s].degInitial < pointDeg;
-      pointDeg < styleGraph[s].degFinaly;
       if (
         styleGraph[s].degInitial < pointDeg &&
         pointDeg < styleGraph[s].degFinaly
@@ -258,7 +258,6 @@ function generateDataOfGrphLanguages(languages) {
   const dataLegnt = styleGraph.slice(-4).reverse();
   const legend = getElement("legend-grapg-languages");
 
-  console.log(dataLegnt);
   dataLegnt.flatMap((language) => {
     const mark = document.createElement("div");
     mark.setAttribute("class", "mark-legend");
@@ -275,7 +274,6 @@ function generateDataOfGrphLanguages(languages) {
 
     legend.appendChild(lineLegend);
   });
-  console.log(styleGraph);
 }
 function getDegWithXY(x, y) {
   const deg = (Math.atan2(x, y) * 180) / Math.PI;

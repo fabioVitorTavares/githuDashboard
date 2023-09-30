@@ -1,24 +1,26 @@
 *{
   box-sizing: border-box;
   margin: 0;
+
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 body{
   position: relative;
-  padding: 40px;
-  gap: 40px;
+  padding: 100px;
+  gap: 50px;
   background-color: rgb(239, 239, 239);
   display: flex;
   flex-direction: column;
 
 }
 
-#card-graphs, #card-graph-commits{
+#card-graphs, #card-graph-commits, #card-cards{
   background-color: #FFF;
   display: flex;
   flex-direction: row;
   justify-content: center;
   text-align: center;
-  justify-content: center;
+  justify-content: space-between;
   border-radius: 20px;
   box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
 }
@@ -26,28 +28,31 @@ body{
 
 
 #h3-titulo {
-  margin-top: 50px;
+  text-align: center;
+
 }
 
 .container-graph-title-1-3 {
   position: relative;
-  width: 33%;
+  width: 50%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 40px;
-  padding: 40px;
+  padding: 80px;
 }
 
 .container-graph-title-2-3 {
-  width: 66%;
+  position: relative;
+  width: 50%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
   gap: 40px;
-  padding: 40px;
+  padding: 80px;
 }
 
 .container-graph-commits-title {
@@ -91,18 +96,18 @@ body{
 }
 
 /* width */
-#scroll-graph-commits::-webkit-scrollbar {
+#scroll-graph-commits::-webkit-scrollbar, body::-webkit-scrollbar {
   height: 10px;
 }
 
 /* Track */
-#scroll-graph-commits::-webkit-scrollbar-track {
+#scroll-graph-commits::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
   background: #dedede; 
   border-radius: 10px;
 }
  
 /* Handle */
-#scroll-graph-commits::-webkit-scrollbar-thumb {
+#scroll-graph-commits::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
   background: #888; 
   border-radius: 10px;
 }
@@ -159,7 +164,7 @@ body{
 #graph-update-projects-x-months {
   position: relative;
   height: 400px;
-  width: 800px;
+  width: 600px;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -184,6 +189,7 @@ svg {
 .span-month-graph-line {
   position: absolute;
   top: 400px;
+  transform: rotate(45deg);
 }
 
 .span-count-graph-line {
@@ -193,6 +199,7 @@ svg {
 
 
 #legend-grapg-languages {
+  position: absolute;
   width: 100%;
   left: 20px;
   bottom: 20px;
@@ -214,4 +221,39 @@ svg {
 .line-legend {
   display: flex;
   gap: 5px;
+}
+
+@media (max-width: 1100px) {
+  #card-graphs{
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+
+}
+
+@media (max-width: 850px) {
+  .container-graph-title-1-3 
+    ,.container-graph-title-2-3 {
+    transform: scale(0.5);
+  }  
+}
+
+
+
+#card-cards {
+  padding: 40px;
+}
+
+
+.card-info {
+  width: 30%;
+  padding: 20px;
+  background-color: #cdcbcb;
+  border-radius: 8px;
+}
+
+h1 {
+  text-align: center;
 }
