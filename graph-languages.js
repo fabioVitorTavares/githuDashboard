@@ -1,6 +1,6 @@
 import { Octokit } from "https://esm.sh/octokit";
 const octokit = new Octokit({
-  auth: "",
+  auth: process.env.TOKEN,
 });
 const OWNER = "fabioVitorTavares";
 const REPOS = [
@@ -197,30 +197,24 @@ function generateDataOfGrphLanguages(languages) {
 
   const graphContainer = getElement("graph-languages-container");
 
-  styleGraph.sort((a, b) => (a.percent > b.percent ? 1 : -1));
-
   const partsGraph = [];
-  styleGraph
-    // .sort((a, b) => (a.percent > b.percent ? 1 : -1))
-    .flatMap((graphStyle, index) => {
-      const partGrph = document.createElement("div");
-      partGrph.setAttribute("class", "part-graph");
-      partGrph.setAttribute("id", `part-graph-${index}`);
-      partGrph.style = getStyle(graphStyle);
-      partGrph.addEventListener("mousemove", hoverGraph);
-      partGrph.addEventListener("mouseleave", outGraph);
-      graphContainer.appendChild(partGrph);
-      partsGraph.push(partGrph);
-    });
+  styleGraph.flatMap((graphStyle, index) => {
+    const partGrph = document.createElement("div");
+    partGrph.setAttribute("class", "part-graph");
+    partGrph.setAttribute("id", `part-graph-${index}`);
+    partGrph.style = getStyle(graphStyle);
+    partGrph.addEventListener("mousemove", hoverGraph);
+    partGrph.addEventListener("mouseleave", outGraph);
+    graphContainer.appendChild(partGrph);
+    partsGraph.push(partGrph);
+  });
 
   function hoverGraph(e) {
-    console.log(e);
     const pointInGrph = {
-      x: e?.pageX - e?.target?.offsetLeft,
-      y: (e?.pageY - e?.target?.offsetTop - 200) * -1,
+      x: e?.offsetX - e?.target?.offsetWidth / 2,
+      y: e?.offsetY - e?.target?.offsetHeight / 2,
     };
     const pointDeg = getDegWithXY(pointInGrph.x, pointInGrph.y);
-    console.log(pointInGrph);
     for (const s in styleGraph) {
       if (
         styleGraph[s].degInitial < pointDeg &&
@@ -255,7 +249,9 @@ function generateDataOfGrphLanguages(languages) {
     }
   }
 
-  const dataLegnt = styleGraph.slice(-4).reverse();
+  const styleGraph2 = styleGraph.copyWithin();
+  const dataLegnt = styleGraph2.slice(0, 4);
+
   const legend = getElement("legend-grapg-languages");
 
   dataLegnt.flatMap((language) => {
@@ -276,7 +272,7 @@ function generateDataOfGrphLanguages(languages) {
   });
 }
 function getDegWithXY(x, y) {
-  const deg = (Math.atan2(x, y) * 180) / Math.PI;
+  const deg = (Math.atan2(x, y * -1) * 180) / Math.PI;
   if (deg < 0) {
     return 360 + deg;
   }

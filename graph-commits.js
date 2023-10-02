@@ -1,8 +1,9 @@
+import "dotenv/config";
 import { Octokit } from "https://esm.sh/octokit";
 const octokit = new Octokit({
-  auth: "",
+  auth: process.env.TOKEN,
 });
-
+console.log(">>>", process.env.TOKEN);
 const OWNER = "fabioVitorTavares";
 const REPOS = [
   "githubDashboard",
@@ -624,6 +625,7 @@ async function generateGrphCommits(REPOS) {
   }
 
   const tooltipCommits = getElement("tooltip-graph-commits");
+
   function outGraph(e) {
     tooltipCommits.innerHTML = "";
     tooltipCommits.style = `display: none;`;
@@ -638,12 +640,12 @@ async function generateGrphCommits(REPOS) {
       display: block;
       background-color: ${colorTooltip};
       left: ${e.pageX}px;
-      top: ${e.pageY - 60}px;
+      top: ${e.pageY - 80}px;
       `;
   }
 
   const scrollDiv = getElement("scroll-graph-commits");
-  graphContainer.addEventListener("mousemove", scroolFunction);
+  // graphContainer.addEventListener("mousemove", scroolFunction);
   graphContainer.addEventListener("wheel", whellScroll);
 
   function scroolFunction(e) {
