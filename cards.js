@@ -1,6 +1,7 @@
 import { Octokit } from "https://esm.sh/octokit";
+
 const octokit = new Octokit({
-  auth: process.env.TOKEN,
+  auth: `${process.env.TOKEN}`,
 });
 
 const OWNER = "fabioVitorTavares";

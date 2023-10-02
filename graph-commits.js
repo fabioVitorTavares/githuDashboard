@@ -1,9 +1,10 @@
-import "dotenv/config";
 import { Octokit } from "https://esm.sh/octokit";
 const octokit = new Octokit({
-  auth: process.env.TOKEN,
+  auth: `${process.env.TOKEN}`,
 });
 console.log(">>>", process.env.TOKEN);
+console.log(">>>", window.process);
+
 const OWNER = "fabioVitorTavares";
 const REPOS = [
   "githubDashboard",
